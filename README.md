@@ -5,7 +5,7 @@
 채용 담당자의 수작업 부담을 줄이고, 효율적인 이력서 필터링을 지원합니다.
 
 ## 📂 사용 데이터셋
-- [Updated Resume Dataset on Kaggle](https://www.kaggle.com/datasets/arihantjain/updated-resume-dataset)
+- [Updated Resume Dataset on Kaggle](https://www.kaggle.com/datasets/gauravduttakiit/resume-dataset)
 
 
 ## 🔧 실행 방법
@@ -16,6 +16,3 @@ venv\Scripts\activate
 
 # 의존성 설치
 pip install -r requirements.txt
-
-# 실행
-python main.py
