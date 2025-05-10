@@ -3,14 +3,17 @@ import torch
 import numpy as np
 from tqdm import tqdm
 
+
 # 사전 학습된 BERT 모델과 토크나이저 로드
-# 'bert-base-uncased'는 소문자로만 구성된 BERT 사전학습 모델을 의미
+# 'bert-base-uncased'는 소문자로만 구성된 BERT 사전학습 모델을 의미(gpu or cpu)
 # 문장을 토큰으로 바꾸는 토크나이저 로드
 # 사전 학습된 BERT 모델 로드
 # 모델을 추론 모드로 설정 (이미 학습된 모델을 사용하기 때문에)
 tokenizer = BertTokenizer.from_pretrained('bert-base-uncased')
-model = BertModel.from_pretrained('bert-base-uncased')
+device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+model = BertModel.from_pretrained('bert-base-uncased').to(device)
 model.eval()
+
 
 def embed_text(text: str) -> np.ndarray:
 
@@ -20,6 +23,9 @@ def embed_text(text: str) -> np.ndarray:
   # padding='max_length': 부족한 길이는 512까지 0으로 채움
   input = tokenizer(text, return_tensors='pt', truncation= True, max_length=512, padding='max_length')
 
+  # gpu 가능시 이동
+  input = {key: val.to(device) for key, val in input.items()}
+
   # 추론 시에는 torch.no_grad()로 연산 그래프 생성 방지 (메모리 절약, 속도 향상)
   with torch.no_grad():
     outputs = model(**input)
@@ -28,10 +34,8 @@ def embed_text(text: str) -> np.ndarray:
     # BERT 출력은 (batch_size, sequence_length, hidden_size) 형태
     # 첫 번째 토큰([CLS])만 선택
     cls_embedding = outputs.last_hidden_state[:, 0, :]
-
-  return cls_embedding.squeeze().numpy()
-
-
+    
+  return cls_embedding.squeeze().cpu().numpy()
 
 
 def embed_texts(texts: list[str]) -> np.ndarray:
@@ -41,4 +45,5 @@ def embed_texts(texts: list[str]) -> np.ndarray:
     vec = embed_text(text)
     embeddings.append(vec)
   
+  print(len(embeddings))
   return np.array(embeddings)
