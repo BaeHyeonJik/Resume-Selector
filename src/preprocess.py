@@ -33,7 +33,7 @@ def preprocess_text(text):
 
 
 # 데이터 불러오기
-def preprocess_data(file_path):
+def preprocess_data(file_path: str) -> pd.DataFrame:
     df = pd.read_csv(file_path)
     download_nltk_resources()
     df['clean_resume'] = df['Resume'].apply(preprocess_text)
